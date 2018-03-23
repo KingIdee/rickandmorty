@@ -29,7 +29,8 @@ class RickAndMortyState extends State<RickAndMorty> {
   var _rickAndMortyList = <Result>[];
   var _rickAndMortyListString = <String>[];
   final _biggerFont = const TextStyle(fontSize: 18.0);
-  var _LOG = new Logger("APP_LOGGER");
+  int i=0;
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,10 @@ class RickAndMortyState extends State<RickAndMorty> {
       ),
     );*/
 
-
+    if (i==0) {
+      _getRickAndMortyCharacters();
+      i++;
+    }
     return new Scaffold (
       appBar: new AppBar(
         title: new Text('Rick and Morty'),
@@ -84,8 +88,9 @@ class RickAndMortyState extends State<RickAndMorty> {
 
   // setup ListView
   Widget _buildListView(){
-    _getRickAndMortyCharacters();
+
     _rickAndMortyListString.add("Hate!");
+    _rickAndMortyListString.add("HateII!");
     return new ListView.builder(
         padding: const EdgeInsets.all(16.0),
         itemCount: 1,
@@ -118,6 +123,13 @@ class RickAndMortyState extends State<RickAndMorty> {
   // this function performs a network call to fetch rick and morty characters
   _getRickAndMortyCharacters() async {
     var url = 'https://rickandmortyapi.com/api/character';
+
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((LogRecord rec) {
+      print('${rec.level.name}: ${rec.time}: ${rec.message}');
+    });
+    var _LOG = new Logger("R&M");
+
     var httpClient = new HttpClient();
 
     List<Result> result;
@@ -127,22 +139,15 @@ class RickAndMortyState extends State<RickAndMorty> {
       if (response.statusCode == HttpStatus.OK) {
         var json = await response.transform(UTF8.decoder).join();
         var data = JSON.decode(json);
-
-        /*for(int i=0;i<10;i++){
-
-        }*/
-
         result = data['results'];
-        _LOG.info("result",result);
-        _LOG.log(Level.INFO, result);
+        _LOG.fine(result);
+        _LOG.fine(result[0]);
 
       } else {
-        _LOG.log(Level.WARNING, "Error during parsing");
+        _LOG.severe("Network issues");
       }
     } catch (exception) {
-      _LOG.log(Level.SEVERE, exception);
-
-      /*result = 'Failed getting IP address';*/
+      _LOG.severe(exception);
     }
 
     // If the widget was removed from the tree while the message was in flight,
@@ -152,7 +157,6 @@ class RickAndMortyState extends State<RickAndMorty> {
 
     setState(() {
       _rickAndMortyList = result;
-      return _buildListView();
     });
 
   }
