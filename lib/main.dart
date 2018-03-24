@@ -5,6 +5,7 @@ import 'package:rick_and_morty/model_classes.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:logging/logging.dart';
+import 'package:rick_and_morty/result.dart';
 
 void main() => runApp(new MyApp());
 var httpClient = new HttpClient();
@@ -140,8 +141,14 @@ class RickAndMortyState extends State<RickAndMorty> {
         var json = await response.transform(UTF8.decoder).join();
         var data = JSON.decode(json);
         result = data['results'];
-        _LOG.fine(result);
-        _LOG.fine(result[0]);
+
+//decoded = data
+
+
+        for (var word in data['results']) {
+          _LOG.fine(word['image'].toString());
+          _LOG.fine(word['name'].toString());
+        }
 
       } else {
         _LOG.severe("Network issues");
