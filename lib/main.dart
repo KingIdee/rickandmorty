@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:rick_and_morty/model.dart';
 import 'package:rick_and_morty/model_classes.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -27,8 +28,9 @@ class RickAndMorty extends StatefulWidget {
 
 class RickAndMortyState extends State<RickAndMorty> {
 
-  var _rickAndMortyList = <Result>[];
-  var _rickAndMortyListString = <String>[];
+  //var _rickAndMortyList = <Result>[];
+  //var _rickAndMortyListString = <String>[];
+  var modelList = <Model>[];
   final _biggerFont = const TextStyle(fontSize: 18.0);
   int i=0;
 
@@ -69,19 +71,19 @@ class RickAndMortyState extends State<RickAndMorty> {
   }
 
   // setup single item in ListView
-  Widget _buildRow(String result) {
+  Widget _buildRow(Model model) {
     return new ListTile(
 
       title: new Text(
-        result,
+        model.name,
         style: _biggerFont,
       ),
 
-      /*leading: new CachedNetworkImage(
-        imageUrl: result.image,
+      leading: new CachedNetworkImage(
+        imageUrl: model.imageUrl,
         placeholder: new CircularProgressIndicator(),
         errorWidget: new Icon(Icons.error),
-      )*/
+      )
 
 
     );
@@ -90,11 +92,11 @@ class RickAndMortyState extends State<RickAndMorty> {
   // setup ListView
   Widget _buildListView(){
 
-    _rickAndMortyListString.add("Hate!");
-    _rickAndMortyListString.add("HateII!");
+    //_rickAndMortyListString.add("Hate!");
+    //_rickAndMortyListString.add("HateII!");
     return new ListView.builder(
         padding: const EdgeInsets.all(16.0),
-        itemCount: 1,
+        itemCount: modelList.length,
         // The itemBuilder callback is called once per suggested word pairing,
         // and places each suggestion into a ListTile row.
         // For even rows, the function adds a ListTile row for the word pairing.
@@ -116,7 +118,7 @@ class RickAndMortyState extends State<RickAndMorty> {
             // ...then generate 10 more and add them to the suggestions list.
             _suggestions.addAll(generateWordPairs().take(10));
           }*/
-          return _buildRow(_rickAndMortyListString[i]);
+          return _buildRow(modelList[i]);
         }
     );
   }
@@ -142,12 +144,11 @@ class RickAndMortyState extends State<RickAndMorty> {
         var data = JSON.decode(json);
         result = data['results'];
 
-//decoded = data
-
-
-        for (var word in data['results']) {
-          _LOG.fine(word['image'].toString());
-          _LOG.fine(word['name'].toString());
+        for (var k in data['results']) {
+          var model = new Model();
+          model.name = k['name'].toString();
+          model.imageUrl = k['image'].toString();
+          modelList.add(model);
         }
 
       } else {
@@ -163,7 +164,7 @@ class RickAndMortyState extends State<RickAndMorty> {
     if (!mounted) return;
 
     setState(() {
-      _rickAndMortyList = result;
+      //_rickAndMortyList = result;
     });
 
   }
