@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rick_and_morty/model.dart';
-import 'package:rick_and_morty/model_classes.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:logging/logging.dart';
-import 'package:rick_and_morty/result.dart';
 
 void main() => runApp(new MyApp());
 var httpClient = new HttpClient();
@@ -29,20 +26,17 @@ class RickAndMorty extends StatefulWidget {
 class RickAndMortyState extends State<RickAndMorty> {
 
   var modelList = <Model>[];
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-  int i=0;
+  final _customFont = const TextStyle(fontSize: 18.0);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    setState(() {
-      _getRickAndMortyCharacters();
-    });
+    _getRickAndMortyCharacters();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return new Scaffold (
       appBar: new AppBar(
         title: new Text('Rick and Morty'),
@@ -57,7 +51,7 @@ class RickAndMortyState extends State<RickAndMorty> {
 
       title: new Text(
         model.name,
-        style: _biggerFont,
+        style: _customFont,
       ),
 
       leading: new CachedNetworkImage(
@@ -106,19 +100,18 @@ class RickAndMortyState extends State<RickAndMorty> {
       if (response.statusCode == HttpStatus.OK) {
         var json = await response.transform(UTF8.decoder).join();
         var data = JSON.decode(json);
-        //result = data['results'];
 
         for (var k in data['results']) {
           var model = new Model();
           model.name = k['name'].toString();
           model.imageUrl = k['image'].toString();
           result.add(model);
-          _LOG.severe("Wrong choice");
         }
 
         httpClient.close();
       } else {
-        _LOG.severe("Network issues");
+        _LOG.severe(response.statusCode);
+        _LOG.severe(response);
       }
     } catch (exception) {
       _LOG.severe(exception);
